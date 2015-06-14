@@ -1,0 +1,19 @@
+{
+  "name": "reddit-steam-tools-server",
+  "version": "0.0.1",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "JoP",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^1.2.1",
+    "express": "^4.11.0",
+    "request": "^2.55.0"
+  },
+  "devDependencies": {
+    "superagent": "^0.21.0"
+  }
+}
