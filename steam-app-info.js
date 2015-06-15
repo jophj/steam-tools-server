@@ -4,6 +4,8 @@ var async         = require('async');
 
 var SteamAppInfoBuilder = function (appId) {
 	var STORE_URL = "http://store.steampowered.com/api/appdetails";
+	var PC_GAMING_WIKI_URL = "http://pcgamingwiki.com/w/api.php";
+	
 	var appInfo = {
 		name: null,
 		type: null,
@@ -29,7 +31,6 @@ var SteamAppInfoBuilder = function (appId) {
 		return appInfo;
 	};
 	
-	//http://pcgamingwiki.com/w/api.php?action=askargs&conditions=Steam%20AppID::8870&format=json
 	var buildRequests = function () {
 		var regions = ['eur', 'us', 'ru', 'ca', 'uk', 'br', 'au'];
 		var requests = [];
@@ -53,6 +54,26 @@ var SteamAppInfoBuilder = function (appId) {
 				}
 			});
 		}, this);
+		
+		requests.push({
+			requestOptions: {
+				url: PC_GAMING_WIKI_URL,
+				qs: {
+					"conditions": 'Steam AppID::' + appId,
+					"action": 'askargs',
+					"format": 'json'
+				}
+			},
+			callback: function (body, requestConfig) {
+				var data = JSON.parse(body);
+				if (data.query.results.length !== 0){
+					var name = data.query.results[Object.keys(data.query.results)[0]].fulltext;
+					console.log("name porcoddio", name);
+					appInfo.pcgwUrl = data.query.results[name].fullurl;
+					console.log("pcgwurl porcamadonna", appInfo.pcgwUrl);
+				}
+			}
+		});
 		
 		return requests;
 	};
