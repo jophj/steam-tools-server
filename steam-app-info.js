@@ -88,7 +88,6 @@ var SteamAppInfoBuilder = function (appId) {
 	};
 	
 	var buildCallback = function (appInfo, callback) {
-		console.log(appInfo);
 		if (callback)
 			callback(appInfo);
 	};
