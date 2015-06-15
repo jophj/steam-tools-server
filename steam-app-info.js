@@ -33,28 +33,33 @@ var SteamAppInfoBuilder = function (appId) {
 	var buildRequests = function () {
 		var regions = ['eur', 'us', 'ru', 'ca', 'uk', 'br', 'au'];
 		var requests = [];
+		
 		regions.forEach(function(regionCode) {
-			requests.push(
-				{
+			requests.push({
+				requestOptions:{
 					url: STORE_URL,
 					qs: {
 						appids: appId,
 						cc: regionCode
-					}	
+					}
+				},
+				callback: function (body, requestConfig) {
+					var parsed = parseResponse(body);
+					if (parsed){
+						appInfo.name = parsed.name;
+						appInfo.type = parsed.type;
+						appInfo.prices[requestConfig.requestOptions.qs.cc] = parsed.price;
+					}
 				}
-			);
+			});
 		}, this);
+		
 		return requests;
 	};
 	
-	var requestData = function (requestOptions, callback) {
-		request(requestOptions, function (err, response, body) {
-			var parsed = parseResponse(body);
-			if (parsed){
-				appInfo.name = parsed.name;
-				appInfo.type = parsed.type;
-				appInfo.prices[requestOptions.qs.cc] = parsed.price;
-			}
+	var requestData = function (requestConfig, callback) {
+		request(requestConfig.requestOptions, function (err, response, body) {
+			requestConfig.callback(body, requestConfig);
 			callback();
 		});
 	};
