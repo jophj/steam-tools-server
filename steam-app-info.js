@@ -10,8 +10,8 @@ var SteamAppInfoBuilder = function (appId) {
 		name: null,
 		type: null,
 		appUrl : null,
-		matascore: null,
-		platform: null,
+		metacritic: null, //{score, url}
+		platforms: null, //{windows, mac, linux} boolean
 		cards: null,
 		pcgwUrl: null,
 		prices: {
@@ -21,14 +21,9 @@ var SteamAppInfoBuilder = function (appId) {
 	var parseResponse = function (response) {
 		var responseAsJson = JSON.parse(response);
 		if (!responseAsJson[appId].success)
-			return false;
+			return null;
 		
-		var appInfo = {
-			name: responseAsJson[appId].data['name'],
-			type: responseAsJson[appId].data['type'],
-			price: responseAsJson[appId].data['price_overview']
-		};
-		return appInfo;
+		return responseAsJson[appId].data;
 	};
 	
 	var buildRequests = function () {
@@ -49,7 +44,16 @@ var SteamAppInfoBuilder = function (appId) {
 					if (parsed){
 						appInfo.name = parsed.name;
 						appInfo.type = parsed.type;
-						appInfo.prices[requestConfig.requestOptions.qs.cc] = parsed.price;
+						appInfo.prices[requestConfig.requestOptions.qs.cc] = parsed.price_overview;
+						appInfo.metacritic = parsed.metacritic;
+						appInfo.platforms = parsed.platforms;
+						appInfo.appUrl = 'http://store.steampowered.com/app/' + parsed.steam_appid;
+						
+						appInfo.cards = false;
+						for (var i = 0; i < parsed.categories.length; i++) {
+							if (parsed.categories[i].id == 29)
+								appInfo.cards = true;
+						}
 					}
 				}
 			});
@@ -68,9 +72,7 @@ var SteamAppInfoBuilder = function (appId) {
 				var data = JSON.parse(body);
 				if (data.query.results.length !== 0){
 					var name = data.query.results[Object.keys(data.query.results)[0]].fulltext;
-					console.log("name porcoddio", name);
 					appInfo.pcgwUrl = data.query.results[name].fullurl;
-					console.log("pcgwurl porcamadonna", appInfo.pcgwUrl);
 				}
 			}
 		});
