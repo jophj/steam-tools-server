@@ -7,6 +7,11 @@ var SteamAppInfoBuilder = function (appId) {
 	var appInfo = {
 		name: null,
 		type: null,
+		appUrl : null,
+		matascore: null,
+		platform: null,
+		cards: null,
+		pcgwUrl: null,
 		prices: {
 		}
 	};
@@ -24,8 +29,9 @@ var SteamAppInfoBuilder = function (appId) {
 		return appInfo;
 	};
 	
+	//http://pcgamingwiki.com/w/api.php?action=askargs&conditions=Steam%20AppID::8870&format=json
 	var buildRequests = function () {
-		var regions = ['eur', 'us', 'ru'];
+		var regions = ['eur', 'us', 'ru', 'ca', 'uk', 'br', 'au'];
 		var requests = [];
 		regions.forEach(function(regionCode) {
 			requests.push(
@@ -42,7 +48,6 @@ var SteamAppInfoBuilder = function (appId) {
 	};
 	
 	var requestData = function (requestOptions, callback) {
-		console.log(requestOptions);
 		request(requestOptions, function (err, response, body) {
 			var parsed = parseResponse(body);
 			if (parsed){
